@@ -1,8 +1,9 @@
 const { Sequelize ,Model,DataTypes} = require('sequelize');
-const video = require('/Video.js');
+const video = require('Video.js');
+const config = require('./config.js');
 
-const sequelize = new Sequelize('database', 'username', 'password', {
-    host: 'localhost',
+const sequelize = new Sequelize(config.dbname, config.username, config.password, {
+    host: config.host,
     dialect: 'mysql' 
   });
 
