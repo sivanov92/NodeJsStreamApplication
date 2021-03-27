@@ -38,4 +38,6 @@ User.init({
 
 User.hasMany(video,{foreignKey:'author'});
 
+await User.sync({ force: true });
+
 module.exports = User;
