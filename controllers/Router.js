@@ -2,9 +2,10 @@ var express = require('express')
 var app = express()
 var router = express.Router();
 var jwt = require('jsonwebtoken');
-var config = require('./config.js');
+var config = require('../config.js');
 
-var userRouter = require('UserController.js');
+var userRouter = require('../controllers/UserController.js');
+var videoRouter = require('../controllers/VideoController.js');
 
 router.use(function(req,res,next){
   let token = req.get('Authorization');
@@ -17,5 +18,6 @@ router.use(function(req,res,next){
 });
 
 router.use('/',userRouter);
+router.use('/',videoRouter)
 
 module.exports = router;
