@@ -1,6 +1,6 @@
 const { Sequelize ,Model,DataTypes} = require('sequelize');
-const user = require('User.js');
-const config = require('./config.js');
+const user = require('../models/User.js');
+const config = require('../config.js');
 
 const sequelize = new Sequelize(config.dbname, config.username, config.password, {
     host: config.host,
@@ -16,8 +16,19 @@ Video.init({
     allowNull: false
   },
   author: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  file:{
+    type: DataTypes.STRING,
+    allowNull:false 
+  },
+  uid:{
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  thumbnail:{
     type: DataTypes.STRING
-    // allowNull defaults to true
   }
 }, {
   // Other model options go here
