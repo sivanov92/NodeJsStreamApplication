@@ -38,4 +38,6 @@ Video.init({
 
 Video.belongsTo(user);
 
+await Video.sync({ force: true });
+
 module.exports = Video;
