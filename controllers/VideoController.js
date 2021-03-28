@@ -1,6 +1,8 @@
 var express = require('express');
 var config = require('../config.js');
 const Video = require('../models/Video.js');
+const User = require('../models/User.js');
+
 var router = express.Router();
 
 app.use(express.json()) // for parsing application/json
@@ -14,6 +16,17 @@ const videos = await Video.findAll();
  res.json(JSON.stringify(videos));
 });
 
+//Get all videos FOR A SPECIFIC AUTHOR
+router.get('/videos/:authorID',(req,res)=>{
+    let authorID = req.params.authorID;
+    if(authorID == null){
+        res.end();
+    }
+    const author = User.findOne({where : {id:authorID}});
+     res.json(JSON.stringify(author.getVideos()));
+    });
+
+    
 //Get a specific video
 router.get('/videos/:uid',(req,res)=>{
     let uid_param = req.params.uid;
@@ -52,9 +65,13 @@ router.post('/videos',(req,res)=>{
                 res.status(403).send(`Please fill all fields , ${key} is missing`);
             }
            }    
-         const new_video = await Video.create(video_body);
+         var video_author =   await User.findOne({where : {email : body.author}});
+         const new_video =  await Video.create(video_body);
+         await video_author.addVideo(new_video);
+         res.status(201).json(JSON.stringify(new_video));
+
     }
-    res.json(JSON.stringify(new_video));
+    res.status(400);
    });
    
 //Update a video
