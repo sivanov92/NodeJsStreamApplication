@@ -1,4 +1,4 @@
-var routing = require('../controllers/Router.js');
+var routing = require('./controllers/Router.js');
 
 var express = require('express');
 var router = express.Router();

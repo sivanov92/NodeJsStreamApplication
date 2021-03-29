@@ -2,7 +2,9 @@ var express = require('express');
 var config = require('../config.js');
 const Video = require('../models/Video.js');
 const User = require('../models/User.js');
+const fileUpload = require('express-fileupload');
 
+app.use(fileUpload());
 var router = express.Router();
 
 app.use(express.json()) // for parsing application/json
@@ -11,13 +13,13 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/${config.cloudflare_acc_id}/stream`;
 
 //Get all videos
-router.get('/videos',(req,res)=>{
+router.get('/videos',async (req,res)=>{
 const videos = await Video.findAll();
  res.json(JSON.stringify(videos));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
-router.get('/videos/:authorID',(req,res)=>{
+router.get('/videos/:authorID',async (req,res)=>{
     let authorID = req.params.authorID;
     if(authorID == null){
         res.end();
@@ -28,7 +30,7 @@ router.get('/videos/:authorID',(req,res)=>{
 
     
 //Get a specific video
-router.get('/videos/:uid',(req,res)=>{
+router.get('/videos/:uid',async(req,res)=>{
     let uid_param = req.params.uid;
     const videos = await Video.findOne({where : {uid:uid_param}});
 
@@ -36,11 +38,13 @@ router.get('/videos/:uid',(req,res)=>{
    });
    
 //Post a new video
-router.post('/videos',(req,res)=>{
+router.post('/videos',async (req,res)=>{
     let body = req.body;
 
-    //change this
-    let file_loc = {'file':body.file};
+    if(!req.files.video){
+        return res.status(400).send('No files named /"video/" were uploaded.');
+    }
+    let file_loc = {'file':req.files.video};
 
     let args = {
         'method':"POST",
@@ -75,7 +79,7 @@ router.post('/videos',(req,res)=>{
    });
    
 //Update a video
-router.put('/video/:uid',(req,res)=>{
+router.put('/video/:uid',async(req,res)=>{
  let uid_param = req.params.uid;
  let title_param = req.body.title;
  const vid = await Video.update({title:title_param},{uid:uid_param});
@@ -86,7 +90,7 @@ router.put('/video/:uid',(req,res)=>{
 });
 
 //Delete a video
-router.delete('/videos/:uid',(req,res)=>{
+router.delete('/videos/:uid',async(req,res)=>{
  let uid_param = req.params.uid;
  let args = {
     'method':"DELETE",
