@@ -12,12 +12,12 @@ var app = express()
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-router.get('/users',(req,res)=>{
+router.get('/users',async(req,res)=>{
   const users =await  User.findAll();
   res.status(200).json(JSON.stringify(users));
 });
 
-router.put('/users/:id',(req,res)=>{
+router.put('/users/:id',async(req,res)=>{
     let params = req.params;
     let data = req.body; 
     if(params.id == null || params.id == ''){
@@ -30,7 +30,7 @@ router.put('/users/:id',(req,res)=>{
     res.end();
   });
 
-router.delete('/users/:id',(req,res)=>{
+router.delete('/users/:id',async(req,res)=>{
     let params = req.params;
     if(params.id == null || params.id == ''){
         res.status(403).send('USER ID not set');    
@@ -43,7 +43,7 @@ router.delete('/users/:id',(req,res)=>{
   });
   
 
-router.post('/login',(req,res)=>{
+router.post('/login',async(req,res)=>{
    let data = req.body; 
    let user = await User.findOne({where:{email:data.email}});
    if( user == null || data.password){
@@ -58,7 +58,7 @@ router.post('/login',(req,res)=>{
     res.end();
 });
 
-router.post('/register',(req,res)=>{
+router.post('/register',async(req,res)=>{
  let data = req.body;
  let userdata = {
      firstName: data.firstName,
