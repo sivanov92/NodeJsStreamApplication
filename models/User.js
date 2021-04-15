@@ -1,10 +1,11 @@
 const { Sequelize ,Model,DataTypes} = require('sequelize');
-const video = require('../models/Video.js');
+const video = require('./Video');
 const config = require('../config.js');
 
 const sequelize = new Sequelize(config.dbname, config.username, config.password, {
     host: config.host,
-    dialect: 'mysql' 
+    dialect: 'mysql' ,
+    port:config.db_port
   });
 
   class User extends Model {}
@@ -37,7 +38,17 @@ User.init({
 });
 
 User.hasMany(video,{foreignKey:'author'});
+video.belongsTo(User);
 
-await User.sync({ force: true });
+const sync = async()=>{
+ try{   
+  await User.sync({ force: true });
+ }
+ catch(err){
+  console.log(err);
+ }  
+};
+
+sync();
 
 module.exports = User;
