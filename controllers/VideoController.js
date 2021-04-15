@@ -3,6 +3,7 @@ var config = require('../config.js');
 const Video = require('../models/Video.js');
 const User = require('../models/User.js');
 const fileUpload = require('express-fileupload');
+var app = express();
 
 app.use(fileUpload());
 var router = express.Router();
