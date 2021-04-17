@@ -5,7 +5,11 @@ const config = require('../config.js');
 const sequelize = new Sequelize(config.dbname, config.username, config.password, {
     host: config.host,
     dialect: 'mysql',
-    port:config.db_port 
+    port:config.db_port ,
+    retry: {
+      match: [/Deadlock/i],
+      max: 3
+  }
   });
 
   class Video extends Model {}
@@ -17,7 +21,7 @@ Video.init({
     allowNull: false
   },
   author: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull:false
   },
   file:{
@@ -39,7 +43,7 @@ Video.init({
 
 const sync = async()=>{
   try{   
-   await Video.sync({ force: true });
+   await Video.sync({ alter: true });
   }
   catch(err){
    console.log(err);

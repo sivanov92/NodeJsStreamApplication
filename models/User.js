@@ -42,7 +42,7 @@ video.belongsTo(User);
 
 const sync = async()=>{
  try{   
-  await User.sync({ force: true });
+  await User.sync({ alter: true });
  }
  catch(err){
   console.log(err);
