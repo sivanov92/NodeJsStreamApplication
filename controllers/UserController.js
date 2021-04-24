@@ -12,12 +12,12 @@ var app = express()
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-router.get('/users',async(req,res)=>{
+router.get('/',async(req,res)=>{
   const users =await  User.findAll();
   res.status(200).json(JSON.stringify(users));
 });
 
-router.put('/users/:id',async(req,res)=>{
+router.put('/:id',async(req,res)=>{
     let params = req.params;
     let data = req.body; 
     if(params.id == null || params.id == ''){
@@ -30,7 +30,7 @@ router.put('/users/:id',async(req,res)=>{
     res.end();
   });
 
-router.delete('/users/:id',async(req,res)=>{
+router.delete('/:id',async(req,res)=>{
     let params = req.params;
     if(params.id == null || params.id == ''){
         res.status(403).send('USER ID not set');    
