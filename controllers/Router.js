@@ -6,7 +6,7 @@ var config = require('../config.js');
 
 var userRouter = require('../controllers/UserController.js');
 var videoRouter = require('../controllers/VideoController.js');
-/*
+
 router.use(function(req,res,next){
   let token = req.get('Authorization');
   jwt.verify(token, config.API_SECRET_KEY, function(err, decoded) {
@@ -17,9 +17,9 @@ router.use(function(req,res,next){
   next();
 });
 
-router.use('/',userRouter);
-router.use('/',videoRouter)
-*/
+router.use('/users',userRouter);
+router.use('/videos',videoRouter)
+
 
 
 module.exports = router;

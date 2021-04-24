@@ -14,13 +14,13 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/${config.cloudflare_acc_id}/stream`;
 
 //Get all videos
-router.get('/videos',async (req,res)=>{
+router.get('/',async (req,res)=>{
 const videos = await Video.findAll();
  res.status(200).json(JSON.stringify(videos));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
-router.get('/videos/:authorID',async (req,res)=>{
+router.get('/:authorID',async (req,res)=>{
     let authorID = req.params.authorID;
     if(authorID == null){
         const videos = await Video.findAll();
@@ -32,7 +32,7 @@ router.get('/videos/:authorID',async (req,res)=>{
 
     
 //Get a specific video
-router.get('/videos/:uid',async(req,res)=>{
+router.get('/:uid',async(req,res)=>{
     let uid_param = req.params.uid;
     if( uid == null){
         const videos = await Video.findAll();
@@ -43,7 +43,7 @@ router.get('/videos/:uid',async(req,res)=>{
    });
    
 //Post a new video
-router.post('/videos',async (req,res)=>{
+router.post('/',async (req,res)=>{
     let body = req.body;
 
     if(!req.files.video){
@@ -84,7 +84,7 @@ router.post('/videos',async (req,res)=>{
    });
    
 //Update a video
-router.put('/video/:uid',async(req,res)=>{
+router.put('/:uid',async(req,res)=>{
  let uid_param = req.params.uid;
  let title_param = req.body.title;
  const vid = await Video.update({title:title_param},{uid:uid_param});
@@ -95,7 +95,7 @@ router.put('/video/:uid',async(req,res)=>{
 });
 
 //Delete a video
-router.delete('/videos/:uid',async(req,res)=>{
+router.delete('/:uid',async(req,res)=>{
  let uid_param = req.params.uid;
  let args = {
     'method':"DELETE",

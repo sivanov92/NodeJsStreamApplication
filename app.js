@@ -5,7 +5,7 @@ var app = express();
 
 const PORT = process.env.PORT || 5000;
 
-//router.use('/',routing);
+app.use('/',routing);
 
 app.get('/',(req,res)=>{
   res.status(200).send('Welcome this is the home page for the stream app ');
