@@ -6,7 +6,7 @@ var config = require('../config.js');
 
 var userRouter = require('../controllers/UserController.js');
 var videoRouter = require('../controllers/VideoController.js');
-
+/*
 router.use(function(req,res,next){
   let token = req.get('Authorization');
   jwt.verify(token, config.API_SECRET_KEY, function(err, decoded) {
@@ -19,7 +19,7 @@ router.use(function(req,res,next){
 
 router.use('/',userRouter);
 router.use('/',videoRouter)
-
+*/
 router.get('/',(req,res)=>{
   res.status(200).send('Welcome this is the home page for the stream app ');
 });
