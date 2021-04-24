@@ -20,9 +20,6 @@ router.use(function(req,res,next){
 router.use('/',userRouter);
 router.use('/',videoRouter)
 */
-router.get('/',(req,res)=>{
-  res.status(200).send('Welcome this is the home page for the stream app ');
-});
 
 
 module.exports = router;
