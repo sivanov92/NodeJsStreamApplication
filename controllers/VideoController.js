@@ -16,14 +16,15 @@ var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/${config.cl
 //Get all videos
 router.get('/videos',async (req,res)=>{
 const videos = await Video.findAll();
- res.json(JSON.stringify(videos));
+ res.status(200).json(JSON.stringify(videos));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
 router.get('/videos/:authorID',async (req,res)=>{
     let authorID = req.params.authorID;
     if(authorID == null){
-        res.end();
+        const videos = await Video.findAll();
+        res.status(200).json(JSON.stringify(videos));
     }
     const author = User.findOne({where : {id:authorID}});
      res.json(JSON.stringify(author.getVideos()));
@@ -33,8 +34,11 @@ router.get('/videos/:authorID',async (req,res)=>{
 //Get a specific video
 router.get('/videos/:uid',async(req,res)=>{
     let uid_param = req.params.uid;
+    if( uid == null){
+        const videos = await Video.findAll();
+        res.status(200).json(JSON.stringify(videos));
+    }
     const videos = await Video.findOne({where : {uid:uid_param}});
-
     res.json(JSON.stringify(videos));
    });
    
