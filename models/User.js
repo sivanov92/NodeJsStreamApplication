@@ -37,7 +37,7 @@ User.init({
   modelName: 'User' // We need to choose the model name
 });
 
-User.hasMany(video,{foreignKey:'author'});
+User.hasMany(video,{foreignKey:'UserId'});
 video.belongsTo(User);
 
 const sync = async()=>{
