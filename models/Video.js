@@ -20,7 +20,7 @@ Video.init({
     type: DataTypes.STRING,
     allowNull: false
   },
-  author: {
+  UserId: {
     type: DataTypes.INTEGER,
     allowNull:false
   },

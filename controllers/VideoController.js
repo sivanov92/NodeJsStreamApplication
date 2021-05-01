@@ -14,33 +14,29 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/${config.cloudflare_acc_id}/stream`;
 
 //Get all videos
-router.get('/',async (req,res)=>{
-const videos = await Video.findAll();
- res.status(200).json(JSON.stringify(videos));
+router.get('/:uid?', async(req,res)=>{
+    let uid_param = req.params.uid;
+    if( uid == null){
+        const videos = await Video.findAll().catch(e=>{console.log(e);});
+        res.status(200).json(JSON.stringify(videos));
+        return;
+    }
+    const videos = await Video.findOne({where : {uid:uid_param}})
+    .catch(e => {console.log(e);});
+    res.status(200).json(JSON.stringify(videos()));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
-router.get('/:authorID',async (req,res)=>{
+router.get('/author/:authorID',async (req,res)=>{
     let authorID = req.params.authorID;
     if(authorID == null){
         const videos = await Video.findAll();
         res.status(200).json(JSON.stringify(videos));
+        return;
     }
     const author = User.findOne({where : {id:authorID}});
      res.json(JSON.stringify(author.getVideos()));
     });
-
-    
-//Get a specific video
-router.get('/:uid',async(req,res)=>{
-    let uid_param = req.params.uid;
-    if( uid == null){
-        const videos = await Video.findAll();
-        res.status(200).json(JSON.stringify(videos));
-    }
-    const videos = await Video.findOne({where : {uid:uid_param}});
-    res.json(JSON.stringify(videos));
-   });
    
 //Post a new video
 router.post('/',async (req,res)=>{
@@ -48,6 +44,7 @@ router.post('/',async (req,res)=>{
 
     if(!req.files.video){
         return res.status(400).send('No files named /"video/" were uploaded.');
+        return;
     }
     let file_loc = {'file':req.files.video};
 
@@ -78,7 +75,7 @@ router.post('/',async (req,res)=>{
          const new_video =  await Video.create(video_body);
          await video_author.addVideo(new_video);
          res.status(201).json(JSON.stringify(new_video));
-
+        return;
     }
     res.status(400);
    });
@@ -90,6 +87,7 @@ router.put('/:uid',async(req,res)=>{
  const vid = await Video.update({title:title_param},{uid:uid_param});
  if(vid != null ){
      res.status(200);
+     return;
  }
  res.status(400);
 });
@@ -109,6 +107,7 @@ var videos_del = await fetch(`${base_cloudflare_endpoint}/${uid}`,args);
 if(videos_del.status == 200){
     await Video.destroy({ where : {uid : uid_param}});
     res.status(200);
+    return;
 }
 res.status(400);
 });
