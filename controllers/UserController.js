@@ -75,7 +75,7 @@ router.post('/login',async(req,res)=>{
 
 router.post('/register',async(req,res)=>{
  let data = req.body;
-
+ console.log('REQ body '+data);
  let userdata = {
      firstName: data.firstName,
      lastName : data.lastName,
