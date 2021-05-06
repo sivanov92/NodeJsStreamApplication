@@ -2,21 +2,22 @@ var express = require('express');
 var config = require('../config.js');
 const Video = require('../models/Video.js');
 const User = require('../models/User.js');
-const fileUpload = require('express-fileupload');
+const fileupload = require('express-fileupload');
+const fetch = require('node-fetch');
 var app = express();
-
-app.use(fileUpload());
+const fs = require('fs/promises');
 var router = express.Router();
 
-app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+router.use(express.json()) // for parsing application/json
+router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+router.use(fileupload());
 
-var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/${config.cloudflare_acc_id}/stream`;
+var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 
 //Get all videos
 router.get('/:uid?', async(req,res)=>{
     let uid_param = req.params.uid;
-    if( uid == null){
+    if( uid_param == null){
         const videos = await Video.findAll().catch(e=>{console.log(e);});
         res.status(200).json(JSON.stringify(videos));
         return;
@@ -41,24 +42,32 @@ router.get('/author/:authorID',async (req,res)=>{
 //Post a new video
 router.post('/',async (req,res)=>{
     let body = req.body;
-
-    if(!req.files.video){
-        return res.status(400).send('No files named /"video/" were uploaded.');
+    if(!req.files.file){
+        return res.status(400).send('No files named /"file/" were uploaded.');
         return;
     }
-    let file_loc = {'file':req.files.video};
+    let video_temp_name = 'tmp/'+req.files.file.name;
+
+    let write_data = await fs.appendFile(video_temp_name,req.files.file.data,{flag:'wx'}).catch((e) => {console.log(e);});
+
+    let file_loc = {'file':req.files.file};
 
     let args = {
         'method':"POST",
         'body':JSON.stringify(file_loc),
         'headers':{
-            "content-type":"application/json",
+            "content-type":"multipart/form-data",
             "X-Auth-Email":config.cloudflare_email,
             "X-Auth-Key":config.cloudflare_edit_stream_token
         }
     };   
-    var videos = await fetch(base_cloudflare_endpoint,args);
+    var videos = await fetch(base_cloudflare_endpoint,args).catch((e) => {console.log(e);});
+    console.log(videos);
+
+    let delete_data = await fs.unlink(video_temp_name);
+      
     if(videos.status == 200){
+        console.log('success');
         let video_body = {
             'title':body.title,
             'author':body.author,
@@ -69,15 +78,17 @@ router.post('/',async (req,res)=>{
         for(key in video_body){
             if(video_body.key == null || video_body.key==''){
                 res.status(403).send(`Please fill all fields , ${key} is missing`);
+                return;
             }
            }    
-         var video_author =   await User.findOne({where : {email : body.author}});
-         const new_video =  await Video.create(video_body);
-         await video_author.addVideo(new_video);
+         var video_author =   await User.findOne({where : {email : body.author}}).catch((e) => {console.log(e);});
+         const new_video =  await Video.create(video_body).catch((e) => {console.log(e);});
+         await video_author.addVideo(new_video).catch((e) => {console.log(e);});
          res.status(201).json(JSON.stringify(new_video));
         return;
     }
     res.status(400);
+    res.end();
    });
    
 //Update a video
