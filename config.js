@@ -22,6 +22,7 @@ module.exports = {
     'cloudflare_edit_stream_token':CloudflareEditStreamToken,
     'cloudflare_read_stream_token':CloudflareReadStreamToken,
     'cloudflare_email':CloudflareEmail,
-    'cloudflare_acc_id':CloudflareAccID
+    'cloudflare_acc_id':CloudflareAccID,
+    'cloudflare_stream_key':'03d293b516dc9accf2f93d8a933f2868ad7dc'
 };
 
