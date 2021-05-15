@@ -26,7 +26,7 @@ router.get('/:uid?', async(req,res)=>{
     }
     const videos = await Video.findOne({where : {uid:uid_param}})
     .catch(e => {console.log(e);});
-    res.status(200).json(JSON.stringify(videos()));
+    res.status(200).json(JSON.stringify(videos));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
@@ -39,7 +39,7 @@ router.get('/author/:authorID',async (req,res)=>{
     }
     const author = await User.findOne({where : {id:authorID}}).catch((e)=>{console.log(e);});
     const videos = await author.getVideos().catch(e=>{console.log(e);});
-     res.json(JSON.stringify(videos));
+     res.status(200).json(JSON.stringify(videos));
     });
    
 //Post a new video
@@ -71,7 +71,6 @@ router.post('/',async (req,res)=>{
     let delete_data = await fs.unlink(video_temp_name);
       
     if(videos.status == 200){
-        console.log('success');
         let video_body = {
             'title':body.title,
             'UserId':body.author,
@@ -93,7 +92,7 @@ router.post('/',async (req,res)=>{
          res.status(201).json(JSON.stringify(new_video));
         return;
     }
-    res.status(400);
+    res.status(video.status);
     res.end();
    });
    
@@ -101,8 +100,8 @@ router.post('/',async (req,res)=>{
 router.put('/:uid',async(req,res)=>{
  let uid_param = req.params.uid;
  let title_param = req.body.title;
- const vid = await Video.update({title:title_param},{uid:uid_param}).catch((e)=>{console.log(e);});
- res.status(vid.status);
+ const video = await Video.update({title:title_param},{uid:uid_param}).catch((e)=>{console.log(e);});
+ res.status(200).json(JSON.stringify(video));
 });
 
 //Delete a video

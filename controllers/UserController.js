@@ -34,6 +34,7 @@ router.put('/:id',async(req,res)=>{
     if(update != null){ 
        res.status(200).json(JSON.stringify(update));
     }
+    res.status(404);
     res.end();
   });
 
@@ -49,6 +50,7 @@ router.delete('/:id',async(req,res)=>{
        res.status(200).send('User Deleted');
        return;
     }
+    res.status(404);
     res.end();
   });
   
@@ -75,7 +77,6 @@ router.post('/login',async(req,res)=>{
 
 router.post('/register',async(req,res)=>{
  let data = req.body;
- console.log(data);
  let userdata = {
      firstName: data.firstName,
      lastName : data.lastName,
