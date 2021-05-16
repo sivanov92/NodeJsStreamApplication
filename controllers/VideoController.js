@@ -9,10 +9,12 @@ var app = express();
 const fs = require('fs/promises');
 const fsys = require('fs');
 var router = express.Router();
+var cors = require('cors');
 
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 router.use(fileupload());
+router.use(cors());
 
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 
