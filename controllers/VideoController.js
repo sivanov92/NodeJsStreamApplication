@@ -21,21 +21,21 @@ var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${
 
 //Get all videos
 router.get('/:uid?', async(req,res)=>{
+    console.log(req.params.uid);
     if( typeof req.params.uid == 'undefined'){
         const videos = await Video.findAll().catch(e=>{console.log(e);});
         res.status(200).json(JSON.stringify(videos));
         return;
     }
     let uid_param = req.params.uid;
-    const videos = await Video.findOne({where : {uid:uid_param}})
-    .catch(e => {console.log(e);});
+    const videos = await Video.findOne({where : {uid:uid_param}}).catch(e => {console.log(e);});
     res.status(200).json(JSON.stringify(videos));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
 router.get('/author/:authorID',async (req,res)=>{
     if(typeof req.params.authorID == 'undefined'){
-        const videos = await Video.findAll();
+        const videos = await Video.findAll().catch(e=>{console.log(e);});
         res.status(200).json(JSON.stringify(videos));
         return;
     }
@@ -71,7 +71,7 @@ router.post('/',async (req,res)=>{
     var videos = await fetch(base_cloudflare_endpoint,args).catch((e) => {console.log(e);});
     const data = await videos.json();
 
-    let delete_data = await fs.unlink(video_temp_name);
+    let delete_data = await fs.unlink(video_temp_name).catch(e=>{console.log(e);});;
       
     if(videos.status == 200){
         let video_body = {
