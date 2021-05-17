@@ -5,11 +5,10 @@ const Video = require('../models/Video.js');
 const User = require('../models/User.js');
 const fileupload = require('express-fileupload');
 const fetch = require('node-fetch');
-var app = express();
 const fs = require('fs/promises');
 const fsys = require('fs');
-var router = express.Router();
 var cors = require('cors');
+var router = express.Router();
 
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
