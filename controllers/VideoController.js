@@ -21,12 +21,12 @@ var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${
 
 //Get all videos
 router.get('/:uid?', async(req,res)=>{
-    let uid_param = req.params.uid;
-    if( uid_param == null){
+    if( typeof req.params.uid == 'undefined'){
         const videos = await Video.findAll().catch(e=>{console.log(e);});
         res.status(200).json(JSON.stringify(videos));
         return;
     }
+    let uid_param = req.params.uid;
     const videos = await Video.findOne({where : {uid:uid_param}})
     .catch(e => {console.log(e);});
     res.status(200).json(JSON.stringify(videos));
@@ -34,12 +34,12 @@ router.get('/:uid?', async(req,res)=>{
 
 //Get all videos FOR A SPECIFIC AUTHOR
 router.get('/author/:authorID',async (req,res)=>{
-    let authorID = req.params.authorID;
-    if(authorID == null){
+    if(typeof req.params.authorID == 'undefined'){
         const videos = await Video.findAll();
         res.status(200).json(JSON.stringify(videos));
         return;
     }
+    let authorID = req.params.authorID;
     const author = await User.findOne({where : {id:authorID}}).catch((e)=>{console.log(e);});
     const videos = await author.getVideos().catch(e=>{console.log(e);});
      res.status(200).json(JSON.stringify(videos));
@@ -101,6 +101,10 @@ router.post('/',async (req,res)=>{
    
 //Update a video
 router.put('/:uid',async(req,res)=>{
+ if(typeof req.params.uid == 'undefined'){
+     res.status(404).send('Please set up UID param');
+     return;
+ }
  let uid_param = req.params.uid;
  let title_param = req.body.title;
  const video = await Video.update({title:title_param},{uid:uid_param}).catch((e)=>{console.log(e);});
@@ -109,6 +113,10 @@ router.put('/:uid',async(req,res)=>{
 
 //Delete a video
 router.delete('/:uid',async(req,res)=>{
+ if(typeof req.params.uid == 'undefined'){
+    res.status(404).send('Please set up UID param');
+    return;
+   }   
  let uid_param = req.params.uid;
  let args = {
     'method':"DELETE",
