@@ -10,7 +10,9 @@ var randomstring = require("randomstring");
 
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-router.use(cors());
+router.use(cors({
+  origin:false
+}));
 
 router.get('/:id?',async(req,res)=>{
   let params = req.params;

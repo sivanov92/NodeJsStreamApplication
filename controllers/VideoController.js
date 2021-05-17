@@ -14,7 +14,9 @@ var cors = require('cors');
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 router.use(fileupload());
-router.use(cors());
+router.use(cors({
+    origin:false
+}));
 
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 
