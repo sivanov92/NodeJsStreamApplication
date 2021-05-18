@@ -20,7 +20,13 @@ router.use(cors({
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 
 //Get all videos
-router.get('/', async(req,res)=>{
+router.get('/:uid?', async(req,res)=>{
+    if(req.params.uid != 'undefined'){
+        let uid = req.params.uid;
+        const videos_uid = await Video.findAll({where:{uid:uid}}).catch(e=>{console.log(e);});
+        res.status(200).json(JSON.stringify(videos_uid));
+        return;    
+    }
     const videos = await Video.findAll().catch(e=>{console.log(e);});
     res.status(200).json(JSON.stringify(videos));
 });
