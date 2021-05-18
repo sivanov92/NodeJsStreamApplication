@@ -15,8 +15,8 @@ router.use(cors({
 }));
 
 router.get('/:id?',async(req,res)=>{
-  let params = req.params;
-  if(params.id != null){
+  if(req.params.id !== undefined){
+    let params = req.params;
     const users =await  User.findAll({where:{id:params.id}});
     res.status(200).json(JSON.stringify(users));
     return;
@@ -26,12 +26,12 @@ router.get('/:id?',async(req,res)=>{
 });
 
 router.put('/:id',async(req,res)=>{
-    let params = req.params;
     let data = req.body; 
-    if(params.id == null || params.id == ''){
+    if(req.params.id === undefined){
         res.status(403).send('USER ID not set');    
         return;
     }
+    let params = req.params;
     let update = await User.update(data,{where:{id:params.id}});
     if(update != null){ 
        res.status(200).json(JSON.stringify(update));
@@ -41,11 +41,11 @@ router.put('/:id',async(req,res)=>{
   });
 
 router.delete('/:id',async(req,res)=>{
-    let params = req.params;
-    if(params.id == null || params.id == ''){
+    if(req.params.id === undefined){
         res.status(403).send('USER ID not set');  
         return;  
     }
+    let params = req.params;
     let del = await User.destroy({where:{id:params.id}})
     .catch((e)=>{console.log(e);});
     if(del != null){ 

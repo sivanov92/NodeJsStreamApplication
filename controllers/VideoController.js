@@ -100,7 +100,7 @@ router.post('/',async (req,res)=>{
    
 //Update a video
 router.put('/:uid',async(req,res)=>{
- if(typeof req.params.uid == 'undefined'){
+ if(req.params.uid === undefined){
      res.status(404).send('Please set up UID param');
      return;
  }
@@ -112,7 +112,7 @@ router.put('/:uid',async(req,res)=>{
 
 //Delete a video
 router.delete('/:uid',async(req,res)=>{
- if(typeof req.params.uid == 'undefined'){
+ if(req.params.uid == undefined){
     res.status(404).send('Please set up UID param');
     return;
    }   
