@@ -21,7 +21,7 @@ var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${
 
 //Get all videos
 router.get('/:uid?', async(req,res)=>{
-    if(req.params.uid != 'undefined'){
+    if(req.params.uid !== undefined){
         let uid = req.params.uid;
         const videos_uid = await Video.findAll({where:{uid:uid}}).catch(e=>{console.log(e);});
         res.status(200).json(JSON.stringify(videos_uid));
