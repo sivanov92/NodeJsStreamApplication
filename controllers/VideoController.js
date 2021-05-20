@@ -20,22 +20,31 @@ router.use(cors({
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 
 //Get all videos
-router.get('/:uid?', async(req,res)=>{
+router.get('/:uid?/:id?', async(req,res)=>{
+    let conditions = {
+
+    };
+    if(req.params.uid !== undefined || req.params.id !== undefined){
+      conditions.where = {
+
+      };
+    }  
     if(req.params.uid !== undefined){
         let uid = req.params.uid;
-        const videos_uid = await Video.findAll({where:{uid:uid}}).catch(e=>{console.log(e);});
-        res.status(200).json(JSON.stringify(videos_uid));
-        return;    
+        conditions.where.uid = uid;
     }
-    const videos = await Video.findAll().catch(e=>{console.log(e);});
+    if(req.params.id !== undefined){
+        let id = req.params.id;
+        conditions.where.id = id;
+    }
+    const videos = await Video.findAll(conditions).catch(e=>{console.log(e);});
     res.status(200).json(JSON.stringify(videos));
 });
 
 //Get all videos FOR A SPECIFIC AUTHOR
 router.get('/author/:authorID',async (req,res)=>{
     if(typeof req.params.authorID == 'undefined'){
-        const videos = await Video.findAll().catch(e=>{console.log(e);});
-        res.status(200).json(JSON.stringify(videos));
+        res.status(400).send('Please set up authorID !');
         return;
     }
     let authorID = req.params.authorID;
@@ -91,8 +100,10 @@ router.post('/',async (req,res)=>{
          var new_video =  await Video.create(video_body).catch((e) => {console.log(e);});
 
          await video_author.addVideo(new_video).catch((e) => {console.log(e);});
-         res.status(201).json(JSON.stringify(new_video));
-        return;
+         if(new_video.length > 0 ){
+          res.status(201).json(JSON.stringify(new_video));
+          return;
+         }
     }
     res.status(video.status);
     res.end();

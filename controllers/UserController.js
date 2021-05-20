@@ -33,11 +33,11 @@ router.put('/:id',async(req,res)=>{
     }
     let params = req.params;
     let update = await User.update(data,{where:{id:params.id}});
-    if(update != null){ 
+    if(update.length > 0){ 
        res.status(200).json(JSON.stringify(update));
+       return;
     }
-    res.status(404);
-    res.end();
+    res.sendStatus(404);
   });
 
 router.delete('/:id',async(req,res)=>{
@@ -48,12 +48,11 @@ router.delete('/:id',async(req,res)=>{
     let params = req.params;
     let del = await User.destroy({where:{id:params.id}})
     .catch((e)=>{console.log(e);});
-    if(del != null){ 
+    if(del.length > 0){ 
        res.status(200).send('User Deleted');
        return;
     }
-    res.status(404);
-    res.end();
+    res.sendStatus(404);
   });
   
 
@@ -79,6 +78,7 @@ router.post('/login',async(req,res)=>{
 
 router.post('/register',async(req,res)=>{
  let data = req.body;
+
  let userdata = {
      firstName: data.firstName,
      lastName : data.lastName,
@@ -87,7 +87,7 @@ router.post('/register',async(req,res)=>{
  };
 
  for(key in userdata){
-  if(userdata[key] == null || userdata[key]==''){
+  if(userdata[key] == null || userdata[key] === undefined){
       res.status(400).send('Please fill all fields');
       return;
   }
@@ -102,7 +102,7 @@ router.post('/register',async(req,res)=>{
   userdata.StreamKey = randomstring.generate();
   let newuser = await User.create(userdata)
   .catch((e) => {console.log(e);}); 
-  if(newuser != null)
+  if(newuser.length > 0)
    { 
     res.status(201).json(JSON.stringify(newuser));
    }
