@@ -7,15 +7,11 @@ const fileupload = require('express-fileupload');
 const fetch = require('node-fetch');
 const fs = require('fs/promises');
 const fsys = require('fs');
-var cors = require('cors');
 var router = express.Router();
 
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 router.use(fileupload());
-router.use(cors({
-    origin:false
-}));
 
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 

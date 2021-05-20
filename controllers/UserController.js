@@ -1,7 +1,6 @@
 var express = require('express');
 const User = require('../models/User.js');
 var router = express.Router();
-var cors = require('cors');
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -10,9 +9,6 @@ var randomstring = require("randomstring");
 
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-router.use(cors({
-  origin:false
-}));
 
 router.get('/:id?',async(req,res)=>{
   if(req.params.id !== undefined){

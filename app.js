@@ -2,7 +2,12 @@ var routing = require('./controllers/Router.js');
 var express = require('express');
 var router = express.Router();
 var app = express();
+var cors = require('cors');
 const PORT = process.env.PORT || 5000;
+
+app.use(cors({
+  origin: '*'
+}));
 
 app.use('/',routing);
 
