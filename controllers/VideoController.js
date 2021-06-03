@@ -15,28 +15,6 @@ router.use(fileupload());
 
 var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${config.cloudflare_acc_id}/stream`;
 
-//Get all videos
-router.get('/:uid?/:id?', async(req,res)=>{
-    let conditions = {
-
-    };
-    if(req.params.uid !== undefined || req.params.id !== undefined){
-      conditions.where = {
-
-      };
-    }  
-    if(req.params.uid !== undefined){
-        let uid = req.params.uid;
-        conditions.where.uid = uid;
-    }
-    if(req.params.id !== undefined){
-        let id = req.params.id;
-        conditions.where.id = id;
-    }
-    const videos = await Video.findAll(conditions).catch(e=>{console.log(e);});
-    res.status(200).json(JSON.stringify(videos));
-});
-
 //Get all videos FOR A SPECIFIC AUTHOR
 router.get('/author/:authorID',async (req,res)=>{
     if(typeof req.params.authorID == 'undefined'){
@@ -44,20 +22,53 @@ router.get('/author/:authorID',async (req,res)=>{
         return;
     }
     let authorID = req.params.authorID;
-    const author = await User.findOne({where : {id:authorID}}).catch((e)=>{console.log(e);});
-    const videos = await author.getVideos().catch(e=>{console.log(e);});
-     res.status(200).json(JSON.stringify(videos));
-    });
-   
+    let author = await User.findOne({where : {id:authorID}}).catch((e)=>{console.log(e);});
+    if( author !== null){
+        let videos = await author.getVideos().catch(e=>{console.log(e);});
+
+        res.status(200).json(videos);  
+    }
+    res.status(400).send('Author not found !');
+});
+
+//Get specific video by ID
+router.get('/:id', async(req,res)=>{
+    if( req.params.id !== undefined){
+       res.sendStatus(400);
+       return; 
+    }  
+    const videos = await Video.findOne({where : { id : req.params.id }}).catch(e=>{console.log(e);});
+
+    res.status(200).json(JSON.stringify(videos));
+});
+
+//Get all videos with an optional UID param
+router.get(':uid?', async(req,res)=>{
+    if(req.query.uid === undefined){
+        const videos = await Video.findAll().catch(e=>{console.log(e);});
+        if( videos !== null){
+            res.status(200).json(JSON.stringify(videos));
+            return;
+        }
+        res.sendStatus(400); 
+        return;
+    }  
+
+    const videos_uid = await Video.findOne({where : { uid : req.query.uid }}).catch(e=>{console.log(e);});
+    
+    res.status(200).json(JSON.stringify(videos_uid));
+});
+
 //Post a new video
 router.post('/',async (req,res)=>{
     let body = req.body;
     if(!req.files.file){
-        return res.status(400).send('No files named /"file/" were uploaded.');
+       res.status(400).send('No files named /"file/" were uploaded.');
+       return;
     }
     let video_temp_name = 'tmp/'+req.files.file.name;
 
-    let write_data = await fs.appendFile(video_temp_name,req.files.file.data,{flag:'wx'}).catch((e) => {console.log(e);});
+    await fs.appendFile(video_temp_name,req.files.file.data,{flag:'wx'}).catch((e) => {console.log(e);});
 
     let form = new formData();
     const buffer = fsys.readFileSync(video_temp_name);
@@ -75,9 +86,9 @@ router.post('/',async (req,res)=>{
     var videos = await fetch(base_cloudflare_endpoint,args).catch((e) => {console.log(e);});
     const data = await videos.json();
 
-    let delete_data = await fs.unlink(video_temp_name).catch(e=>{console.log(e);});;
+    await fs.unlink(video_temp_name).catch(e=>{console.log(e);});;
       
-    if(videos.status == 200){
+    if(videos.ok){
         let video_body = {
             'title':body.title,
             'UserId':body.author,
@@ -86,44 +97,49 @@ router.post('/',async (req,res)=>{
             'thumbnail':data.result.thumbnail
         };
         for(key in video_body){
-            if(video_body[key] == null || video_body[key]==''){
+            if(video_body[key] == null || video_body[key] == ''){
                 res.status(403).send(`Please fill all fields , ${key} is missing`);
                 return;
             }
            }    
          var video_author =   await User.findOne({where : {id : body.author}}).catch((e) => {console.log(e);});
+        if( video_author !== null){
+            var new_video =  await Video.create(video_body).catch((e) => {console.log(e);});
 
-         var new_video =  await Video.create(video_body).catch((e) => {console.log(e);});
+            await video_author.addVideo(new_video).catch((e) => {console.log(e);});
 
-         await video_author.addVideo(new_video).catch((e) => {console.log(e);});
-         if(new_video.length > 0 ){
-          res.status(201).json(JSON.stringify(new_video));
-          return;
-         }
+            if(new_video == true ){
+              res.sendStatus(201);
+              return;
+            }   
+        } 
     }
-    res.status(video.status);
-    res.end();
+    res.sendStatus(videos.status);
    });
    
 //Update a video
-router.put('/:uid',async(req,res)=>{
- if(req.params.uid === undefined){
-     res.status(404).send('Please set up UID param');
+router.put('/:id',async(req,res)=>{
+ if(req.params.id === undefined){
+     res.status(404).send('Please set up ID param');
      return;
  }
- let uid_param = req.params.uid;
+ let id_param = req.params.id;
  let title_param = req.body.title;
- const video = await Video.update({title:title_param},{uid:uid_param}).catch((e)=>{console.log(e);});
- res.status(200).json(JSON.stringify(video));
+ const video = await Video.update({title:title_param},{id:id_param}).catch((e)=>{console.log(e);});
+ if( video == true){
+   res.status(200).json(JSON.stringify(video));
+   return ;
+ }  
+ res.sendStatus(400);
 });
 
 //Delete a video
-router.delete('/:uid',async(req,res)=>{
- if(req.params.uid == undefined){
-    res.status(404).send('Please set up UID param');
+router.delete('/:id',async(req,res)=>{
+ if(req.params.id === undefined){
+    res.status(404).send('Please set up ID param');
     return;
    }   
- let uid_param = req.params.uid;
+ let id_param = req.params.id;
  let args = {
     'method':"DELETE",
     'headers':{
@@ -131,17 +147,17 @@ router.delete('/:uid',async(req,res)=>{
         "X-Auth-Key":config.cloudflare_stream_key
     }
 };   
-var videos_del = await fetch(`${base_cloudflare_endpoint}/${uid_param}`,args).catch((e)=>{console.log(e);});
+var videos_del = await fetch(`${base_cloudflare_endpoint}/${id_param}`,args).catch((e)=>{console.log(e);});
 var res = await videos_del.json().catch((e)=>{console.log(e);});
 
-if(videos_del.status == 200){
-    await Video.destroy({ where : {uid : uid_param}}).catch((e)=>{console.log(e);});
-    res.status(200);
-    res.end();
-    return;
+if(videos_del.ok){
+    let delete_video = await Video.destroy({ where : {id : id_param}}).catch((e)=>{console.log(e);});
+    if(delete_video == true){
+        res.status(200);
+        return;    
+    }
 }
-res.status(videos_del.status);
-res.end();
+res.sendStatus(videos_del.status);
 });
 
 module.exports = router;

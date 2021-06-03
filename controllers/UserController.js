@@ -10,10 +10,10 @@ var randomstring = require("randomstring");
 router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-router.get('/:id?',async(req,res)=>{
+router.get('/:id',async(req,res)=>{
   if(req.params.id !== undefined){
     let params = req.params;
-    const users =await  User.findAll({where:{id:params.id}});
+    const users = await User.findAll({where:{id:params.id}});
     res.status(200).json(JSON.stringify(users));
     return;
   }  
@@ -21,15 +21,20 @@ router.get('/:id?',async(req,res)=>{
   res.status(200).json(JSON.stringify(users));
 });
 
+router.get('/',async(req,res)=>{
+  const users = await User.findAll();
+  res.status(200).json(JSON.stringify(users));
+});
+
 router.put('/:id',async(req,res)=>{
     let data = req.body; 
     if(req.params.id === undefined){
-        res.status(403).send('USER ID not set');    
+        res.status(400).send('USER ID not set');    
         return;
     }
     let params = req.params;
     let update = await User.update(data,{where:{id:params.id}});
-    if(update.length > 0){ 
+    if(update == true){
        res.status(200).json(JSON.stringify(update));
        return;
     }
@@ -44,7 +49,7 @@ router.delete('/:id',async(req,res)=>{
     let params = req.params;
     let del = await User.destroy({where:{id:params.id}})
     .catch((e)=>{console.log(e);});
-    if(del.length > 0){ 
+    if(del == true){ 
        res.status(200).send('User Deleted');
        return;
     }
@@ -54,11 +59,17 @@ router.delete('/:id',async(req,res)=>{
 
 router.post('/login',async(req,res)=>{
    let data = req.body; 
+
+   if(data.email === undefined || data.password === undefined){
+     res.status(400).send('User data not found');  
+     return;
+   }
    let user = await User.findOne({where:{email:data.email}})
    .catch((e) => {console.log(e);});
-   if( user == null || data.password==null ){
-    res.status(400).send('User not found');  
-    return;
+
+   if( user === null ){
+     res.status(400).send('User not found');  
+     return;
    }
     
     let password = data.password;
@@ -70,17 +81,12 @@ router.post('/login',async(req,res)=>{
          return;
         })
         .catch((e) => {console.log(e);});
+        
+    res.sendStatus(400);    
 });
 
 router.post('/register',async(req,res)=>{
  let data = req.body;
-
- let userdata = {
-     firstName: data.firstName,
-     lastName : data.lastName,
-     password : data.password,
-     email : data.email
- };
 
  for(key in userdata){
   if(userdata[key] == null || userdata[key] === undefined){
@@ -96,12 +102,15 @@ router.post('/register',async(req,res)=>{
 });
  
   userdata.StreamKey = randomstring.generate();
+
   let newuser = await User.create(userdata)
-  .catch((e) => {console.log(e);}); 
-  if(newuser.length > 0)
+     .catch((e) => {console.log(e);}); 
+  if(newuser == true)
    { 
     res.status(201).json(JSON.stringify(newuser));
+    return;
    }
+   res.sendStatus(400);
 });
 
 module.exports = router;
