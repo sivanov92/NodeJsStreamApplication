@@ -81,8 +81,6 @@ router.post('/login',async(req,res)=>{
          return;
         })
         .catch((e) => {console.log(e);});
-        
-    res.sendStatus(400);    
 });
 
 router.post('/register',async(req,res)=>{
