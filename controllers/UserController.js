@@ -11,13 +11,8 @@ router.use(express.json()) // for parsing application/json
 router.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 router.get('/:id',async(req,res)=>{
-  if(req.params.id !== undefined){
-    let params = req.params;
-    const users = await User.findAll({where:{id:params.id}});
-    res.status(200).json(JSON.stringify(users));
-    return;
-  }  
-  const users =await  User.findAll();
+  let params = req.params;
+  const users = await User.findAll({where:{id:params.id}});
   res.status(200).json(JSON.stringify(users));
 });
 

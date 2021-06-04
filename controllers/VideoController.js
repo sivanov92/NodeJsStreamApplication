@@ -17,7 +17,7 @@ var base_cloudflare_endpoint = `https://api.cloudflare.com/client/v4/accounts/${
 
 //Get all videos FOR A SPECIFIC AUTHOR
 router.get('/author/:authorID',async (req,res)=>{
-    if(typeof req.params.authorID == 'undefined'){
+    if(req.params.authorID === undefined){
         res.status(400).send('Please set up authorID !');
         return;
     }
@@ -33,7 +33,7 @@ router.get('/author/:authorID',async (req,res)=>{
 
 //Get specific video by ID
 router.get('/:id', async(req,res)=>{
-    if( req.params.id !== undefined){
+    if( req.params.id === undefined){
        res.sendStatus(400);
        return; 
     }  
