@@ -143,20 +143,22 @@ router.delete('/:id',async(req,res)=>{
  let args = {
     'method':"DELETE",
     'headers':{
+        "Content-type":"application/json",
         "X-Auth-Email":config.cloudflare_email,
         "X-Auth-Key":config.cloudflare_stream_key
     }
 };   
-var videos_del = await fetch(`${base_cloudflare_endpoint}/${id_param}`,args).catch((e)=>{console.log(e);});
-var res = await videos_del.json().catch((e)=>{console.log(e);});
-
-if(videos_del.ok){
-    let delete_video = await Video.destroy({ where : {id : id_param}}).catch((e)=>{console.log(e);});
-    if(delete_video == true){
-        res.status(200);
-        return;    
-    }
-}
+ let target_vid = await Video.findOne({where:{id:id_param}}).catch((e)=>{console.log(e);});
+ if(target_vid.uid){
+    var videos_del = await fetch(`${base_cloudflare_endpoint}/${target_vid.uid}`,args).catch((e)=>{console.log(e);});
+    if(videos_del.ok){
+        const delete_video = await Video.destroy({ where : {id : id_param}}).catch((e)=>{console.log(e);});
+        if(delete_video == true){
+            res.sendStatus(200);
+            return;    
+        }
+    }    
+ }
 res.sendStatus(videos_del.status);
 });
 

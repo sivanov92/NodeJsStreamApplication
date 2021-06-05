@@ -75,7 +75,7 @@ router.post('/login',async(req,res)=>{
          res.status(200).json(JSON.stringify(user));
          return;
         })
-        .catch((e) => {console.log(e);});
+        .catch((e) => {res.sendStatus(400);console.log(e);});
 });
 
 router.post('/register',async(req,res)=>{
