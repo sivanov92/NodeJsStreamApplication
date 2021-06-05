@@ -125,7 +125,7 @@ router.put('/:id',async(req,res)=>{
  }
  let id_param = req.params.id;
  let title_param = req.body.title;
- const video = await Video.update({title:title_param},{id:id_param}).catch((e)=>{console.log(e);});
+ const video = await Video.update({title:title_param},{where : {id:id_param}}).catch((e)=>{console.log(e);});
  if( video == true){
    res.status(200).json(JSON.stringify(video));
    return ;
