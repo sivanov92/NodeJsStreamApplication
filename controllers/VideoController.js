@@ -39,7 +39,7 @@ router.get('/:id', async(req,res)=>{
     }  
     const videos = await Video.findOne({where : { id : req.params.id }}).catch(e=>{console.log(e);});
 
-    res.status(200).json(JSON.stringify(videos));
+    res.status(200).json(videos);
 });
 
 //Get all videos with an optional UID param
@@ -47,7 +47,7 @@ router.get(':uid?', async(req,res)=>{
     if(req.query.uid === undefined){
         const videos = await Video.findAll().catch(e=>{console.log(e);});
         if( videos !== null){
-            res.status(200).json(JSON.stringify(videos));
+            res.status(200).json(videos);
             return;
         }
         res.sendStatus(400); 

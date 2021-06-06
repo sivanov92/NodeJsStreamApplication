@@ -12,13 +12,13 @@ router.use(express.urlencoded({ extended: true })) // for parsing application/x-
 
 router.get('/:id',async(req,res)=>{
   let params = req.params;
-  const users = await User.findAll({where:{id:params.id}});
-  res.status(200).json(JSON.stringify(users));
+  const users = await User.findAll({where:{id:params.id}}).catch((e)=>{console.log(e);});
+  res.status(200).json(users);
 });
 
 router.get('/',async(req,res)=>{
-  const users = await User.findAll();
-  res.status(200).json(JSON.stringify(users));
+  const users = await User.findAll().catch((e)=>{console.log(e);});
+  res.status(200).json(users);
 });
 
 router.put('/:id',async(req,res)=>{
