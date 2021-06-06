@@ -30,7 +30,7 @@ router.put('/:id',async(req,res)=>{
     let params = req.params;
     let update = await User.update(data,{where:{id:params.id}});
     if(update == true){
-       res.status(200).json(JSON.stringify(update));
+       res.status(200).json(update);
        return;
     }
     res.sendStatus(404);
@@ -72,7 +72,7 @@ router.post('/login',async(req,res)=>{
         password = password.toString();
     }
     bcrypt.compare(password, user.password).then((result) => {
-         res.status(200).json(JSON.stringify(user));
+         res.status(200).json(user);
          return;
         })
         .catch((e) => {res.sendStatus(400);console.log(e);});
@@ -100,7 +100,7 @@ router.post('/register',async(req,res)=>{
      .catch((e) => {console.log(e);}); 
   if(newuser == true)
    { 
-    res.status(201).json(JSON.stringify(newuser));
+    res.status(201).json(newuser);
     return;
    }
    res.sendStatus(400);

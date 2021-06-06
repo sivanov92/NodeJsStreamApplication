@@ -56,7 +56,7 @@ router.get(':uid?', async(req,res)=>{
 
     const videos_uid = await Video.findOne({where : { uid : req.query.uid }}).catch(e=>{console.log(e);});
     
-    res.status(200).json(JSON.stringify(videos_uid));
+    res.status(200).json(videos_uid);
 });
 
 //Post a new video
@@ -127,7 +127,7 @@ router.put('/:id',async(req,res)=>{
  let title_param = req.body.title;
  const video = await Video.update({title:title_param},{where : {id:id_param}}).catch((e)=>{console.log(e);});
  if( video == true){
-   res.status(200).json(JSON.stringify(video));
+   res.status(200).json(video);
    return ;
  }  
  res.sendStatus(400);
