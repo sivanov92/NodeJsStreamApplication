@@ -14,7 +14,7 @@ const config = {
       allow_origin: '*'
     },
     trans: {
-      ffmpeg: "C:\\ffmpeg\\bin\\ffmpeg.exe",
+      ffmpeg:  "/usr/local/bin/ffmpeg",// "C:\\ffmpeg\\bin\\ffmpeg.exe",
       tasks: [
         {
           app: 'live',
@@ -27,16 +27,6 @@ const config = {
     }
   };
  
-var nms = new NodeMediaServer(config)
-nms.on('prePublish', async (id, StreamPath, args) => {
-    let stream_key = getStreamKeyFromStreamPath(StreamPath);
-    console.log('[NodeEvent on prePublish]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
-});
- 
-const getStreamKeyFromStreamPath = (path) => {
-    let parts = path.split('/');
-    return parts[parts.length - 1];
-};
-nms.run();
+var nms = new NodeMediaServer(config);
 
 module.exports = nms;

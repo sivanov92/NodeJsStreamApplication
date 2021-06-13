@@ -6,6 +6,7 @@ var config = require('../config.js');
 
 var userRouter = require('../controllers/UserController.js');
 var videoRouter = require('../controllers/VideoController.js');
+var streamRouter = require('../controllers/StreamController.js');
 
 /*router.use(function(req,res,next){
   let token = req.get('Authorization');
@@ -20,7 +21,7 @@ var videoRouter = require('../controllers/VideoController.js');
 
 router.use('/users',userRouter);
 router.use('/videos',videoRouter)
-
+router.use('/stream',streamRouter);
 
 
 module.exports = router;
