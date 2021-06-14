@@ -14,7 +14,7 @@ const config = {
       allow_origin: '*'
     },
     trans: {
-      ffmpeg:  "/usr/local/bin/ffmpeg",// "C:\\ffmpeg\\bin\\ffmpeg.exe",
+      ffmpeg: "ffmpeg", // "/usr/local/bin/ffmpeg",// "C:\\ffmpeg\\bin\\ffmpeg.exe",
       tasks: [
         {
           app: 'live',
