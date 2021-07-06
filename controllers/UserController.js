@@ -71,11 +71,13 @@ router.post('/login',async(req,res)=>{
     if (Number.isInteger(password)){
         password = password.toString();
     }
-    bcrypt.compare(password, user.password).then((result) => {
-         res.status(200).json(user);
-         return;
-        })
+    let login = await bcrypt.compare(password, user.password)
         .catch((e) => {res.sendStatus(400);console.log(e);});
+    if( login ){
+      res.status(200).json(user);
+      return;
+    }    
+    res.status(400).send('Password not matching');
 });
 
 router.post('/register',async(req,res)=>{
