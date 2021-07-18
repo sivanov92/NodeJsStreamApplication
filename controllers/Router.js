@@ -8,16 +8,30 @@ var userRouter = require('../controllers/UserController.js');
 var videoRouter = require('../controllers/VideoController.js');
 var streamRouter = require('../controllers/StreamController.js');
 
-/*router.use(function(req,res,next){
-  let token = req.get('Authorization');
-  console.log(token);
-  jwt.verify(token, config.API_SECRET_KEY, function(err, decoded) {
+router.use(function(req,res,next){
+  let authToken = req.headers.authorization.split(' ')[1];
+
+  var token ;
+  jwt.sign({ app: 'StreamBackend' }, authToken, { algorithm: 'HS256'},(err, getToken)=>{
     if(err){
-      res.status(401).send('Unauthorized to send request !');
+       console.log(err);
+       return res.status(401).send('Can not process auth token');
     }
+     token = getToken;
+
+     jwt.verify(token, config.API_SECRET_KEY, {algorithm: 'HS256'}, function(err, decoded) {
+
+      if(err){
+        console.log(err);
+        return res.status(401).send('Incorrect auth token');
+      }
+
+      next();
+    });
+
   });
-  next();
-});*/
+
+});
 
 router.use('/users',userRouter);
 router.use('/videos',videoRouter)
