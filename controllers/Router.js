@@ -9,6 +9,9 @@ var videoRouter = require('../controllers/VideoController.js');
 var streamRouter = require('../controllers/StreamController.js');
 
 router.use(function(req,res,next){
+  if(req.headers.authorization === undefined){
+    return res.status(400).send('No Authorization Header With Bearer Token is sent !');
+  }
   let authToken = req.headers.authorization.split(' ')[1];
 
   var token ;
