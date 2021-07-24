@@ -13,42 +13,38 @@ router.use(express.urlencoded({ extended: true })) // for parsing application/x-
 router.get('/:id',async(req,res)=>{
   let params = req.params;
   const users = await User.findAll({where:{id:params.id}}).catch((e)=>{console.log(e);});
-  res.status(200).json(users);
+  if(users){
+    return res.status(200).json(users);
+  }
+  return res.sendStatus(400);
 });
 
 router.get('/',async(req,res)=>{
   const users = await User.findAll().catch((e)=>{console.log(e);});
-  res.status(200).json(users);
+  if(users){
+   return res.status(200).json(users);
+  }
+  return res.sendStatus(400);
 });
 
 router.put('/:id',async(req,res)=>{
     let data = req.body; 
-    if(req.params.id === undefined){
-        res.status(400).send('USER ID not set');    
-        return;
-    }
     let params = req.params;
     let update = await User.update(data,{where:{id:params.id}});
-    if(update == true){
-       res.status(200).json(update);
-       return;
+    if(update){
+      return res.sendStatus(200);
     }
-    res.sendStatus(404);
+    return res.sendStatus(400);
   });
 
 router.delete('/:id',async(req,res)=>{
-    if(req.params.id === undefined){
-        res.status(403).send('USER ID not set');  
-        return;  
-    }
     let params = req.params;
     let del = await User.destroy({where:{id:params.id}})
     .catch((e)=>{console.log(e);});
-    if(del == true){ 
-       res.status(200).send('User Deleted');
-       return;
+    if( del ){ 
+     return  res.sendStatus(200);
     }
-    res.sendStatus(404);
+   return res.sendStatus(400);
   });
   
 
@@ -61,27 +57,31 @@ router.post('/login',async(req,res)=>{
    }
    let user = await User.findOne({where:{email:data.email}})
    .catch((e) => {console.log(e);});
-
-   if( user === null ){
-     res.status(400).send('User not found');  
-     return;
-   }
-    
+   
+   if( user ){
     let password = data.password;
     if (Number.isInteger(password)){
         password = password.toString();
     }
-    let login = await bcrypt.compare(password, user.password)
-        .catch((e) => {res.sendStatus(400);console.log(e);});
+
+    let login = await bcrypt.compare(password, user.password);
     if( login ){
-      res.status(200).json(user);
-      return;
+      return res.status(200).json(user);
+    }
+
     }    
-    res.status(400).send('Password not matching');
+   return  res.sendStatus(400);
 });
 
 router.post('/register',async(req,res)=>{
  let data = req.body;
+
+ var userdata = {
+    firstName : data.firstName,
+    lastName : data.lastName,
+    email : data.email,
+    password : data.password
+ };
 
  for(key in userdata){
   if(userdata[key] == null || userdata[key] === undefined){
@@ -89,23 +89,25 @@ router.post('/register',async(req,res)=>{
       return;
   }
  }
- bcrypt.genSalt(saltRounds, function(err, salt) {
-    bcrypt.hash(userdata.password, salt, function(err, hash) {
-        // Store hash in your password DB.
-        userdata.password = hash;
-    });
-});
- 
+   let hash = await  bcrypt.hash(userdata.password, saltRounds);
+   if(hash){
+    userdata.password = hash;
+  }
+
   userdata.StreamKey = randomstring.generate();
+   
+  let existingUser = await User.findOne({where:{email:userdata.email}})
+  .catch((e) => {console.log(e);});
+  if(existingUser){
+    return res.status(400).send('User is already registered !');
+  }
 
   let newuser = await User.create(userdata)
      .catch((e) => {console.log(e);}); 
-  if(newuser == true)
-   { 
-    res.status(201).json(newuser);
-    return;
+  if(newuser){ 
+    return res.status(201).json(newuser);
    }
-   res.sendStatus(400);
+  return  res.sendStatus(400);
 });
 
 module.exports = router;
