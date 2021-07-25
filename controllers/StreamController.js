@@ -6,7 +6,8 @@ const fetch = require('node-fetch');
 
 nms.run();
 
-const fetch_all_streams_url = "https://stans-stream-backend.herokuapp.com/api/streams";
+const host = "ec2-3-67-221-143.eu-central-1.compute.amazonaws.com";
+const fetch_all_streams_url = `http://${host}:8000/api/streams`;
 
 const fetch_all_streams = async ()=>{
     let response = await fetch(fetch_all_streams_url)
@@ -36,7 +37,7 @@ const check_stream_keys = async ()=>{
 
 router.get('/',async (req,res)=>{
     var response = [];
-    const stream_url_prefix = "https://stans-stream-backend.herokuapp.com/live/";
+    const stream_url_prefix = `http://${host}:8000/live/`;
     const stream_url_postfix = "/index.m3u8";
 
     await check_stream_keys().then((result)=>{
