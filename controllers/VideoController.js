@@ -25,7 +25,7 @@ router.get('/author/:authorID',async (req,res)=>{
             return res.status(200).json(videos);  
         }
     }
-    return res.sendStatus(400);
+    return res.status(200).json({ error : `Can not get videos for user id ${authorID}`});
 });
 
 //Get specific video by ID
@@ -34,7 +34,7 @@ router.get('/:id', async(req,res)=>{
     if(videos){
       return  res.status(200).json(videos);
     }
-    return res.sendStatus(400);
+    return res.status(200).json({ error : `Can not get video id ${req.params.id}`});
 });
 
 //Get all videos with an optional UID param
@@ -45,22 +45,22 @@ router.get(':uid?', async(req,res)=>{
             res.status(200).json(videos);
             return;
         }
-        return res.sendStatus(400); 
+        return res.status(200).json({ error : `Can not videos `});
     }  
 
     const videos_uid = await Video.findOne({where : { uid : req.query.uid }}).catch((e)=>{console.log(e);});
     if(videos_uid){
       return res.status(200).json(videos_uid);
     }
-    return res.sendStatus(400);
+    return res.status(200).json({ error : `Can not get videos for uid ${req.query.uid}`});
 });
 
 //Post a new video
 router.post('/',async (req,res)=>{
     let body = req.body;
     if(!req.files.file){
-       res.status(400).send('No files named /"file/" were uploaded.');
-       return;
+        return res.status(200).json({ error : `No file named "file" was uploaded`});
+        return;
     }
     let video_temp_name = 'tmp/'+req.files.file.name;
 
@@ -109,30 +109,22 @@ router.post('/',async (req,res)=>{
             }   
         } 
     }
-    return res.sendStatus(400);
+    return res.status(200).json({ error : `Could not upload video ! `});
    });
    
 //Update a video
 router.put('/:id',async(req,res)=>{
- if(req.params.id === undefined){
-     res.status(404).send('Please set up ID param');
-     return;
- }
  let id_param = req.params.id;
  let title_param = req.body.title;
  const video = await Video.update({title:title_param},{where : {id:id_param}}).catch((e)=>{console.log(e);});
  if( video ){
    return res.sendStatus(200);
  }  
- return res.sendStatus(400);
+ return res.status(200).json({ error : `Can not update video id ${id_param}`});
 });
 
 //Delete a video
-router.delete('/:id',async(req,res)=>{
- if(req.params.id === undefined){
-    res.status(404).send('Please set up ID param');
-    return;
-   }   
+router.delete('/:id',async(req,res)=>{  
  let id_param = req.params.id;
  let args = {
     'method':"DELETE",
@@ -152,7 +144,7 @@ router.delete('/:id',async(req,res)=>{
         }
     }    
  }
-  res.sendStatus(400);
+ return res.status(200).json({ error : `Can not delete video id ${id_param}`});
 });
 
 module.exports = router;

@@ -16,7 +16,7 @@ router.get('/:id',async(req,res)=>{
   if(users){
     return res.status(200).json(users);
   }
-  return res.sendStatus(400);
+  return res.status(200).json({ error : `Can not get user id ${params.id}`});
 });
 
 router.get('/',async(req,res)=>{
@@ -24,7 +24,7 @@ router.get('/',async(req,res)=>{
   if(users){
    return res.status(200).json(users);
   }
-  return res.sendStatus(400);
+  return res.status(200).json({ error : `Can not get users `});
 });
 
 router.put('/:id',async(req,res)=>{
@@ -34,7 +34,7 @@ router.put('/:id',async(req,res)=>{
     if(update){
       return res.sendStatus(200);
     }
-    return res.sendStatus(400);
+    return res.status(200).json({ error : `Can not update user id ${params.id}`});
   });
 
 router.delete('/:id',async(req,res)=>{
@@ -44,7 +44,7 @@ router.delete('/:id',async(req,res)=>{
     if( del ){ 
      return  res.sendStatus(200);
     }
-   return res.sendStatus(400);
+    return res.status(200).json({ error : `Can not delete user id ${params.id}`});
   });
   
 
@@ -52,8 +52,7 @@ router.post('/login',async(req,res)=>{
    let data = req.body; 
 
    if(data.email === undefined || data.password === undefined){
-     res.status(400).send('User data not found');  
-     return;
+    return res.status(200).json({ error : ` User data not found`});
    }
    let user = await User.findOne({where:{email:data.email}})
    .catch((e) => {console.log(e);});
@@ -70,7 +69,7 @@ router.post('/login',async(req,res)=>{
     }
 
     }    
-   return  res.sendStatus(400);
+    return res.status(200).json({ error : ` Failed login `});
 });
 
 router.post('/register',async(req,res)=>{
@@ -85,8 +84,7 @@ router.post('/register',async(req,res)=>{
 
  for(key in userdata){
   if(userdata[key] == null || userdata[key] === undefined){
-      res.status(400).send('Please fill all fields');
-      return;
+     return res.status(200).json({ error : ` Please fill all fields `});
   }
  }
    let hash = await  bcrypt.hash(userdata.password, saltRounds);
@@ -99,7 +97,7 @@ router.post('/register',async(req,res)=>{
   let existingUser = await User.findOne({where:{email:userdata.email}})
   .catch((e) => {console.log(e);});
   if(existingUser){
-    return res.status(400).send('User is already registered !');
+    return res.status(200).json({ error : ` User is existent `});
   }
 
   let newuser = await User.create(userdata)
@@ -107,7 +105,7 @@ router.post('/register',async(req,res)=>{
   if(newuser){ 
     return res.status(201).json(newuser);
    }
-  return  res.sendStatus(400);
-});
+   return res.status(200).json({ error : `Can not register user `});
+  });
 
 module.exports = router;
